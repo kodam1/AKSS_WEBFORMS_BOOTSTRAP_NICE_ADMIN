@@ -1,0 +1,183 @@
+
+-----------------------------------------------------------------------------------------------
+
+generate new class library String advance functions in C# asp.net webforms like age and dob viseversa
+
+------------------------------------------------------------------------------------------------
+
+using System;
+using System.Globalization;
+
+namespace StringAdvancedFunctions
+{
+    public static class StringDateExtensions
+    {
+        /// <summary>
+        /// Converts a Date of Birth string to the corresponding age.
+        /// </summary>
+        /// <param name="dob">The date of birth in "yyyy-MM-dd" format.</param>
+        /// <returns>Age as an integer. Returns -1 if invalid date format.</returns>
+        public static int GetAgeFromDOB(string dob)
+        {
+            if (DateTime.TryParseExact(dob, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dobDate))
+            {
+                var today = DateTime.Today;
+                var age = today.Year - dobDate.Year;
+                if (dobDate.Date > today.AddYears(-age)) age--;
+                return age;
+            }
+            return -1; // Invalid date format
+        }
+
+        /// <summary>
+        /// Converts an age to an approximate Date of Birth (DOB).
+        /// </summary>
+        /// <param name="age">The age in years.</param>
+        /// <returns>A string representing the approximate DOB in "yyyy-MM-dd" format.</returns>
+        public static string GetDOBFromAge(int age)
+        {
+            if (age < 0)
+                throw new ArgumentException("Age cannot be negative.", nameof(age));
+
+            var today = DateTime.Today;
+            var dobYear = today.Year - age;
+            return new DateTime(dobYear, today.Month, today.Day).ToString("yyyy-MM-dd");
+        }
+
+        /// <summary>
+        /// Validates if the given string is in a valid DateTime format.
+        /// </summary>
+        /// <param name="dateString">The date string to validate.</param>
+        /// <param name="format">The expected date format. Defaults to "yyyy-MM-dd".</param>
+        /// <returns>True if valid; otherwise, false.</returns>
+        public static bool IsValidDate(string dateString, string format = "yyyy-MM-dd")
+        {
+            return DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+        }
+
+        /// <summary>
+        /// Calculates the number of days between two dates.
+        /// </summary>
+        /// <param name="startDate">Start date in "yyyy-MM-dd" format.</param>
+        /// <param name="endDate">End date in "yyyy-MM-dd" format.</param>
+        /// <returns>Number of days as an integer. Returns -1 if either date is invalid.</returns>
+        public static int DaysBetween(string startDate, string endDate)
+        {
+            if (DateTime.TryParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime start)
+                && DateTime.TryParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime end))
+            {
+                return (end - start).Days;
+            }
+            return -1; // Invalid date format
+        }
+
+        /// <summary>
+        /// Formats a DateTime string to a different format.
+        /// </summary>
+        /// <param name="dateString">The date string to format.</param>
+        /// <param name="currentFormat">The current format of the date string.</param>
+        /// <param name="desiredFormat">The desired format for the output.</param>
+        /// <returns>Formatted date string or empty string if invalid input.</returns>
+        public static string FormatDateString(string dateString, string currentFormat, string desiredFormat)
+        {
+            if (DateTime.TryParseExact(dateString, currentFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+            {
+                return date.ToString(desiredFormat);
+            }
+            return string.Empty; // Invalid date format
+        }
+
+        /// <summary>
+        /// Calculates the number of weeks between two dates.
+        /// </summary>
+        /// <param name="startDate">Start date in "yyyy-MM-dd" format.</param>
+        /// <param name="endDate">End date in "yyyy-MM-dd" format.</param>
+        /// <returns>Number of weeks as an integer. Returns -1 if either date is invalid.</returns>
+        public static int WeeksBetween(string startDate, string endDate)
+        {
+            if (DateTime.TryParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime start)
+                && DateTime.TryParseExact(endDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime end))
+            {
+                return (int)((end - start).TotalDays / 7);
+            }
+            return -1; // Invalid date format
+        }
+
+        /// <summary>
+        /// Adds or subtracts a specific number of days to a given date.
+        /// </summary>
+        /// <param name="date">The starting date in "yyyy-MM-dd" format.</param>
+        /// <param name="days">The number of days to add (positive) or subtract (negative).</param>
+        /// <returns>The resulting date as a string in "yyyy-MM-dd" format, or an empty string if invalid input.</returns>
+        public static string AddDaysToDate(string date, int days)
+        {
+            if (DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate.AddDays(days).ToString("yyyy-MM-dd");
+            }
+            return string.Empty; // Invalid date format
+        }
+
+        /// <summary>
+        /// Checks if a given year is a leap year.
+        /// </summary>
+        /// <param name="year">The year to check.</param>
+        /// <returns>True if the year is a leap year; otherwise, false.</returns>
+        public static bool IsLeapYear(int year)
+        {
+            return DateTime.IsLeapYear(year);
+        }
+
+        /// <summary>
+        /// Gets the name of the day for a given date.
+        /// </summary>
+        /// <param name="date">The date in "yyyy-MM-dd" format.</param>
+        /// <returns>The name of the day (e.g., "Monday") or an empty string if invalid input.</returns>
+        public static string GetDayName(string date)
+        {
+            if (DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate.DayOfWeek.ToString();
+            }
+            return string.Empty; // Invalid date format
+        }
+
+        /// <summary>
+        /// Gets the name of the month for a given date.
+        /// </summary>
+        /// <param name="date">The date in "yyyy-MM-dd" format.</param>
+        /// <returns>The name of the month (e.g., "January") or an empty string if invalid input.</returns>
+        public static string GetMonthName(string date)
+        {
+            if (DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate.ToString("MMMM");
+            }
+            return string.Empty; // Invalid date format
+        }
+
+        /// <summary>
+        /// Gets the number of days in the month of a given date.
+        /// </summary>
+        /// <param name="date">The date in "yyyy-MM-dd" format.</param>
+        /// <returns>Number of days in the month, or -1 if invalid input.</returns>
+        public static int GetDaysInMonth(string date)
+        {
+            if (DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return DateTime.DaysInMonth(parsedDate.Year, parsedDate.Month);
+            }
+            return -1; // Invalid date format
+        }
+
+        /// <summary>
+        /// Adds or subtracts a specific number of months to a given date.
+        /// </summary>
+        /// <param name="date">The starting date in "yyyy-MM-dd" format.</param>
+        /// <param name="months">The number of months to add (positive) or subtract (negative).</param>
+        /// <returns>The resulting date as a string in "yyyy-MM-dd" format, or an empty string if invalid input.</returns>
+        public static string AddMonthsToDate(string date, int months)
+        {
+            if (DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            {
+                return parsedDate.AddMonths(months).ToString("yyyy-MM-dd");

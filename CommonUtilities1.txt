@@ -1,0 +1,291 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Web;
+using System.Web.Caching;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Script.Serialization;
+using System.Xml.Serialization;
+
+public static class CommonUtilities
+{
+    private static readonly string _connectionString = "your_connection_string_here";
+
+    // Database: Execute Non-Query using Stored Procedure
+    public static int ExecuteNonQueryStoredProcedure(string storedProcedureName, SqlParameter[] parameters = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            if (parameters != null)
+                command.Parameters.AddRange(parameters);
+
+            connection.Open();
+            return command.ExecuteNonQuery();
+        }
+    }
+
+    // Database: Execute Scalar using Stored Procedure
+    public static object ExecuteScalarStoredProcedure(string storedProcedureName, SqlParameter[] parameters = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            if (parameters != null)
+                command.Parameters.AddRange(parameters);
+
+            connection.Open();
+            return command.ExecuteScalar();
+        }
+    }
+
+    // Database: Fill DataTable using Stored Procedure
+    public static DataTable GetDataTableStoredProcedure(string storedProcedureName, SqlParameter[] parameters = null)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
+        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            if (parameters != null)
+                command.Parameters.AddRange(parameters);
+
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            return dataTable;
+        }
+    }
+
+    // Database: Execute Reader using Stored Procedure
+    public static SqlDataReader ExecuteReaderStoredProcedure(string storedProcedureName, SqlParameter[] parameters = null)
+    {
+        SqlConnection connection = new SqlConnection(_connectionString);
+        SqlCommand command = new SqlCommand(storedProcedureName, connection)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+
+        if (parameters != null)
+            command.Parameters.AddRange(parameters);
+
+        connection.Open();
+        return command.ExecuteReader(CommandBehavior.CloseConnection);
+    }
+
+    // Session Management: Set Session Value
+    public static void SetSessionValue(string key, object value)
+    {
+        HttpContext.Current.Session[key] = value;
+    }
+
+    // Session Management: Get Session Value
+    public static object GetSessionValue(string key)
+    {
+        return HttpContext.Current.Session[key];
+    }
+
+    // Form Handling: Clear TextBoxes
+    public static void ClearTextBoxes(Control parent)
+    {
+        foreach (Control ctrl in parent.Controls)
+        {
+            if (ctrl is TextBox)
+                ((TextBox)ctrl).Text = string.Empty;
+            else if (ctrl.HasControls())
+                ClearTextBoxes(ctrl);
+        }
+    }
+
+    // Form Handling: Populate DropDownList
+    public static void PopulateDropDownList(DropDownList ddl, DataTable dataTable, string textField, string valueField)
+    {
+        ddl.DataSource = dataTable;
+        ddl.DataTextField = textField;
+        ddl.DataValueField = valueField;
+        ddl.DataBind();
+    }
+
+    // Logging: Log Errors to a File
+    public static void LogError(Exception ex, string filePath)
+    {
+        string errorMessage = $"[{DateTime.Now}] Error: {ex.Message}\nStack Trace: {ex.StackTrace}\n";
+        File.AppendAllText(filePath, errorMessage);
+    }
+
+    // Logging: Log Messages to a File
+    public static void LogMessage(string message, string filePath)
+    {
+        string logMessage = $"[{DateTime.Now}] Message: {message}\n";
+        File.AppendAllText(filePath, logMessage);
+    }
+
+    // Form Handling: Populate GridView
+    public static void PopulateGridView(GridView gridView, DataTable dataTable)
+    {
+        gridView.DataSource = dataTable;
+        gridView.DataBind();
+    }
+
+    // Utility: Format Date
+    public static string FormatDate(DateTime date, string format = "yyyy-MM-dd")
+    {
+        return date.ToString(format);
+    }
+
+    // Utility: Generate Random Password
+    public static string GenerateRandomPassword(int length = 12)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        var password = new char[length];
+        for (int i = 0; i < length; i++)
+        {
+            password[i] = chars[random.Next(chars.Length)];
+        }
+        return new string(password);
+    }
+
+    // Security: Hash Password (Simple SHA256)
+    public static string HashPassword(string password)
+    {
+        using (var sha256 = System.Security.Cryptography.SHA256.Create())
+        {
+            byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            var builder = new System.Text.StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
+    }
+
+    // Security: Validate Password (Simple SHA256)
+    public static bool ValidatePassword(string password, string hashedPassword)
+    {
+        return HashPassword(password) == hashedPassword;
+    }
+
+    // Email: Send Email
+    public static void SendEmail(string to, string subject, string body, string from = "noreply@yourdomain.com")
+    {
+        MailMessage mail = new MailMessage(from, to)
+        {
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = true
+        };
+
+        SmtpClient client = new SmtpClient("smtp.yourdomain.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential("your_username", "your_password"),
+            EnableSsl = true
+        };
+        client.Send(mail);
+    }
+
+    // File Handling: Upload File
+    public static string UploadFile(HttpPostedFile file, string uploadPath)
+    {
+        if (file == null || file.ContentLength == 0)
+            throw new ArgumentException("Invalid file");
+
+        string filePath = Path.Combine(uploadPath, Path.GetFileName(file.FileName));
+        file.SaveAs(filePath);
+        return filePath;
+    }
+
+    // Caching: Add Item to Cache
+    public static void AddToCache(string key, object value, DateTime absoluteExpiration)
+    {
+        HttpContext.Current.Cache.Insert(key, value, null, absoluteExpiration, Cache.NoSlidingExpiration);
+    }
+
+    // Caching: Get Item from Cache
+    public static object GetFromCache(string key)
+    {
+        return HttpContext.Current.Cache[key];
+    }
+
+    // Caching: Remove Item from Cache
+    public static void RemoveFromCache(string key)
+    {
+        HttpContext.Current.Cache.Remove(key);
+    }
+
+    // Image Processing: Resize Image
+    public static void ResizeImage(string inputPath, string outputPath, int width, int height)
+    {
+        using (Image image = Image.FromFile(inputPath))
+        using (Bitmap bitmap = new Bitmap(image, new Size(width, height)))
+        {
+            bitmap.Save(outputPath, ImageFormat.Jpeg);
+        }
+    }
+
+    // Image Processing: Convert Image Format
+    public static void ConvertImageFormat(string inputPath, string outputPath, ImageFormat format)
+    {
+        using (Image image = Image.FromFile(inputPath))
+        {
+            image.Save(outputPath, format);
+        }
+    }
+
+    // Encryption: Encrypt Text
+    public static string EncryptText(string plainText, string key)
+    {
+        using (Aes aes = Aes.Create())
+        {
+            byte[] keyBytes = Convert.FromBase64String(key);
+            aes.Key = keyBytes;
+            aes.IV = new byte[16]; // Zero IV for simplicity
+
+            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+            using (MemoryStream ms = new MemoryStream())
+            using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+            using (StreamWriter sw = new StreamWriter(cs))
+            {
+                sw.Write(plainText);
+                sw.Close();
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
+    }
+
+    // Encryption: Decrypt Text
+    public static string DecryptText(string cipherText, string key)
+    {
+        using (Aes aes = Aes.Create())
+        {
+            byte[] keyBytes = Convert.FromBase64String(key);
+            aes.Key = keyBytes;
+            aes.IV = new byte[16]; // Zero IV for simplicity
+
+            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+            using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(cipherText)))
+            using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+            using (StreamReader sr = new StreamReader(cs))
+            {
+                return sr.ReadToEnd();
+            }
+        }
+    }
+
+    // Advanced Data Operations: Bulk Copy
+    public static void BulkCopy(DataTable dataTable, string
+	
+	string scalarStoredProcedure = "sp_GetEmployeeCount";
+int employeeCount = (int)CommonUtilities.ExecuteScalarStoredProcedure(scalarStoredProcedure);
+Console.WriteLine($"Number of employees: {employeeCount}");

@@ -1,0 +1,154 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.Master" AutoEventWireup="true" CodeBehind="components-breadcrumbs.aspx.cs" Inherits="AKSS_Management.components_breadcrumbs" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Breadcrumbs</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+          <li class="breadcrumb-item">Components</li>
+          <li class="breadcrumb-item active">Breadcrumbs</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Default Breadcrumbs</h5>
+
+              <nav>
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Default</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Centered</h5>
+
+              <nav class="d-flex justify-content-center">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Centered Position</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Right Positioned</h5>
+
+              <nav class="d-flex justify-content-end">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Right Position</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">With Home Icon</h5>
+
+              <nav>
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx"><i class="bi bi-house-door"></i></a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Default</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Breadcrumbs with a page title</h5>
+
+              <div class="pagetitle">
+                <h1>Page Title</h1>
+                <nav>
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                    <li class="breadcrumb-item">Components</li>
+                    <li class="breadcrumb-item active">Breadcrumbs</li>
+                  </ol>
+                </nav>
+              </div><!-- End Breadcrumbs with a page title -->
+
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Breadcrumbs with different dividers</h5>
+
+              <nav style="--bs-breadcrumb-divider: '>';">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Data</li>
+                </ol>
+              </nav>
+
+              <nav style="--bs-breadcrumb-divider: '|';">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Data</li>
+                </ol>
+              </nav>
+
+              <nav style="--bs-breadcrumb-divider: '-';">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Data</li>
+                </ol>
+              </nav>
+
+              <nav style="--bs-breadcrumb-divider: '•';">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Data</li>
+                </ol>
+              </nav>
+
+              <nav style="--bs-breadcrumb-divider: '';">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="Default.aspx">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Library</a></li>
+                  <li class="breadcrumb-item active">Data</li>
+                </ol>
+              </nav>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+</asp:Content>

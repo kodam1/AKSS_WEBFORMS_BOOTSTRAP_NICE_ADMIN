@@ -1,0 +1,221 @@
+
+
+
+-----------------------------------------------------------------------------------------------
+
+generate new class library String advance functions in C# asp.net webforms like age and dob viseversa
+
+------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+
+public static class StringUtilitiesAdvanced
+{
+    // Check if a string is null, empty, or whitespace
+    public static bool IsNullOrEmptyOrWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input);
+    }
+
+    // Convert string to title case
+    public static string ToTitleCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        return textInfo.ToTitleCase(input.ToLower());
+    }
+
+    // Reverse a string
+    public static string Reverse(string input)
+    {
+        if (input == null) return null;
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+
+    // Generate a random string
+    public static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    // Remove all whitespace from a string
+    public static string RemoveWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input) ? input : new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+    }
+
+    // Check if a string contains only digits
+    public static bool IsDigitsOnly(string input)
+    {
+        return input.All(char.IsDigit);
+    }
+
+    // Convert string to camel case
+    public static string ToCamelCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        input = ToTitleCase(input);
+        return char.ToLowerInvariant(input[0]) + input.Substring(1);
+    }
+
+    // Convert string to snake case
+    public static string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var regex = new Regex("([a-z])([A-Z])");
+        return regex.Replace(input, "$1_$2").ToLower();
+    }
+
+    // Truncate a string to a specified length
+    public static string Truncate(string input, int maxLength)
+    {
+        if (string.IsNullOrEmpty(input) || maxLength <= 0) return string.Empty;
+        return input.Length <= maxLength ? input : input.Substring(0, maxLength);
+    }
+
+    // Count occurrences of a character in a string
+    public static int CountOccurrences(string input, char character)
+    {
+        if (input == null) return 0;
+        return input.Count(c => c == character);
+    }
+
+    // Replace multiple spaces with a single space
+    public static string NormalizeSpaces(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        return Regex.Replace(input, @"\s+", " ");
+    }
+
+    // Check if a string is a valid email
+    public static bool IsValidEmail(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(input);
+            return addr.Address == input;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Convert string to base64
+    public static string ToBase64(string input)
+    {
+        if (input == null) return null;
+        var bytes = Encoding.UTF8.GetBytes(input);
+        return Convert.ToBase64String(bytes);
+    }
+
+    // Convert base64 to string
+    public static string FromBase64(string base64Input)
+    {
+        if (base64Input == null) return null;
+        var bytes = Convert.FromBase64String(base64Input);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    // Calculate age from date of birth (in string format)
+    public static int CalculateAgeFromDOB(string dob, string dateFormat = "yyyy-MM-dd")
+    {
+        if (DateTime.TryParseExact(dob, dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateOfBirth))
+        {
+            var today = DateTime.Today;
+            var age = today.Year - dateOfBirth.Year;
+            if (dateOfBirth.Date > today.AddYears(-age)) age--;
+            return age;
+        }
+        throw new ArgumentException("Invalid date format");
+    }
+
+    // Get date of birth from age (returns string format)
+    public static string GetDOBFromAge(int age, string dateFormat = "yyyy-MM-dd")
+    {
+        var today = DateTime.Today;
+        var dob = today.AddYears(-age);
+        return dob.ToString(dateFormat);
+    }
+
+    // Remove diacritics from a string
+    public static string RemoveDiacritics(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        string normalizedString = input.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (char c in normalizedString)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    // Convert string to slug
+    public static string ToSlug(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        string str = RemoveDiacritics(input).ToLower();
+        str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // Remove invalid characters
+        str = Regex.Replace(str, @"\s+", " ").Trim(); // Convert multiple spaces into one space
+        str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim(); // Cut and trim it
+        str = Regex.Replace(str, @"\s", "-"); // Hyphens
+        return str;
+    }
+
+    // Generate a random password with specified length and options
+    public static string GenerateRandomPassword(int length = 12, bool includeSpecialChars = true, bool includeDigits = true)
+    {
+        const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const string digits = "0123456789";
+        const string specialChars = "!@#$%^&*()-_=+<>?";
+
+        string chars = letters;
+        if (includeDigits) chars += digits;
+        if (includeSpecialChars) chars += specialChars;
+
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    // Validate if a string contains only letters
+    public static bool IsLettersOnly(string input)
+    {
+        return input.All(char.IsLetter);
+    }
+
+    // Convert a string to Pascal case
+    public static string ToPascalCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var words = input.Split(new[] { ' ', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
+        var result = string.Concat(words.Select(word => char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant()));
+        return result;
+    }
+
+    // Convert a string to Kebab case
+    public static string ToKebabCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var regex = new Regex("([a-z])([A-Z])");
+        return regex.Replace(input, "$1-$2").ToLower();
+    }
+}
+
+
+

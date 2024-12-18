@@ -1,0 +1,132 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public class DatabaseHelper
+{
+    private readonly string _connectionString;
+
+    public DatabaseHelper()
+    {
+        // Retrieve connection string from Web.config
+        _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+    }
+
+    /// <summary>
+    /// Executes a non-query SQL command (INSERT, UPDATE, DELETE).
+    /// </summary>
+    /// <param name="query">SQL query string.</param>
+    /// <param name="parameters">Optional parameters for the query.</param>
+    /// <returns>The number of rows affected.</returns>
+    public int ExecuteNonQuery(string query, params SqlParameter[] parameters)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                if (parameters != null)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                connection.Open();
+                return command.ExecuteNonQuery();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Executes a SQL query and returns the result as a DataTable.
+    /// </summary>
+    /// <param name="query">SQL query string.</param>
+    /// <param name="parameters">Optional parameters for the query.</param>
+    /// <returns>A DataTable containing the query results.</returns>
+    public DataTable ExecuteDataTable(string query, params SqlParameter[] parameters)
+    {
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                if (parameters != null)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+                    return dataTable;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates a SqlParameter for queries.
+    /// </summary>
+    /// <param name="parameterName">The name of the parameter.</param>
+    /// <param name="value">The value of the parameter.</param>
+    /// <returns>A SqlParameter object.</returns>
+    public SqlParameter CreateParameter(string parameterName, object value)
+    {
+        return new SqlParameter(parameterName, value ?? DBNull.Value);
+    }
+}
+---------------------------------------------------------------------------------------------------
+
+ExecuteNonQuery
+
+DatabaseHelper dbHelper = new DatabaseHelper();
+string insertQuery = "INSERT INTO Students (Name, Age) VALUES (@Name, @Age)";
+int rowsAffected = dbHelper.ExecuteNonQuery(insertQuery,
+    dbHelper.CreateParameter("@Name", "John Doe"),
+    dbHelper.CreateParameter("@Age", 25));
+
+
+ExecuteDataTable
+
+DatabaseHelper dbHelper = new DatabaseHelper();
+string selectQuery = "SELECT * FROM Students WHERE Age > @Age";
+DataTable studentsTable = dbHelper.ExecuteDataTable(selectQuery,
+    dbHelper.CreateParameter("@Age", 18));
+
+// Use studentsTable as needed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

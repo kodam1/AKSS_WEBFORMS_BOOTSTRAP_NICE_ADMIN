@@ -1,0 +1,265 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+
+public static class StringUtilitiesLibrary
+{
+    // Check if a string is null, empty, or whitespace
+    public static bool IsNullOrEmptyOrWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input);
+    }
+
+    // Convert string to title case
+    public static string ToTitleCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        return textInfo.ToTitleCase(input.ToLower());
+    }
+
+    // Reverse a string
+    public static string Reverse(string input)
+    {
+        if (input == null) return null;
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+
+    // Generate a random string
+    public static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    // Remove all whitespace from a string
+    public static string RemoveWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input) ? input : new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+    }
+
+    // Check if a string contains only digits
+    public static bool IsDigitsOnly(string input)
+    {
+        return input.All(char.IsDigit);
+    }
+
+    // Convert string to camel case
+    public static string ToCamelCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        input = ToTitleCase(input);
+        return char.ToLowerInvariant(input[0]) + input.Substring(1);
+    }
+
+    // Convert string to snake case
+    public static string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var regex = new Regex("([a-z])([A-Z])");
+        return regex.Replace(input, "$1_$2").ToLower();
+    }
+
+    // Truncate a string to a specified length
+    public static string Truncate(string input, int maxLength)
+    {
+        if (string.IsNullOrEmpty(input) || maxLength <= 0) return string.Empty;
+        return input.Length <= maxLength ? input : input.Substring(0, maxLength);
+    }
+
+    // Count occurrences of a character in a string
+    public static int CountOccurrences(string input, char character)
+    {
+        if (input == null) return 0;
+        return input.Count(c => c == character);
+    }
+
+    // Replace multiple spaces with a single space
+    public static string NormalizeSpaces(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        return Regex.Replace(input, @"\s+", " ");
+    }
+
+    // Check if a string is a valid email
+    public static bool IsValidEmail(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(input);
+            return addr.Address == input;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Convert string to base64
+    public static string ToBase64(string input)
+    {
+        if (input == null) return null;
+        var bytes = Encoding.UTF8.GetBytes(input);
+        return Convert.ToBase64String(bytes);
+    }
+
+    // Convert base64 to string
+    public static string FromBase64(string base64Input)
+    {
+        if (base64Input == null) return null;
+        var bytes = Convert.FromBase64String(base64Input);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    // Generate MD5 hash for a string
+    public static string GenerateMD5Hash(string input)
+    {
+        using (MD5 md5 = MD5.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            byte[] hash = md5.ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
+    // Generate SHA256 hash for a string
+    public static string GenerateSHA256Hash(string input)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
+    // Convert string to hexadecimal
+    public static string ToHex(string input)
+    {
+        if (input == null) return null;
+        var bytes = Encoding.UTF8.GetBytes(input);
+        var hex = BitConverter.ToString(bytes).Replace("-", "");
+        return hex;
+    }
+
+    // Convert hexadecimal to string
+    public static string FromHex(string hexInput)
+    {
+        if (hexInput == null) return null;
+        int numberChars = hexInput.Length;
+        byte[] bytes = new byte[numberChars / 2];
+        for (int i = 0; i < numberChars; i += 2)
+        {
+            bytes[i / 2] = Convert.ToByte(hexInput.Substring(i, 2), 16);
+        }
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    // Validate if a string is a valid URL
+    public static bool IsValidURL(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+        return Uri.TryCreate(input, UriKind.Absolute, out Uri uriResult)
+               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+    }
+
+    // Escape HTML entities in a string
+    public static string EscapeHtml(string input)
+    {
+        if (input == null) return null;
+        return System.Net.WebUtility.HtmlEncode(input);
+    }
+
+    // Unescape HTML entities in a string
+    public static string UnescapeHtml(string input)
+    {
+        if (input == null) return null;
+        return System.Net.WebUtility.HtmlDecode(input);
+    }
+}
+/*
+--------------------------------------------------------------------------------
+Example Usage
+Check if a string is null, empty, or whitespace
+
+csharp
+bool isEmpty = StringUtilitiesLibrary.IsNullOrEmptyOrWhitespace("   ");
+Console.WriteLine($"Is Empty: {isEmpty}"); // Output: Is Empty: True
+
+Convert string to title case
+
+csharp
+string titleCase = StringUtilitiesLibrary.ToTitleCase("hello world");
+Console.WriteLine($"Title Case: {titleCase}"); // Output: Title Case: Hello World
+
+Reverse a string
+
+csharp
+string reversed = StringUtilitiesLibrary.Reverse("hello");
+Console.WriteLine($"Reversed: {reversed}"); // Output: Reversed: olleh
+
+Generate a random string
+
+csharp
+string randomString = StringUtilitiesLibrary.GenerateRandomString(10);
+Console.WriteLine($"Random String: {randomString}");
+
+Remove all whitespace from a string
+
+csharp
+string withoutWhitespace = StringUtilitiesLibrary.RemoveWhitespace("h e l l o");
+Console.WriteLine($"Without Whitespace: {withoutWhitespace}"); // Output: Without Whitespace: hello
+
+Check if a string contains only digits
+
+csharp
+bool isDigits = StringUtilitiesLibrary.IsDigitsOnly("12345");
+Console.WriteLine($"Is Digits Only: {isDigits}"); // Output: Is Digits Only: True
+
+Convert string to camel case
+
+csharp
+string camelCase = StringUtilitiesLibrary.ToCamelCase("Hello World");
+Console.WriteLine($"Camel Case: {camelCase}"); // Output: Camel Case: helloWorld
+
+Convert string to snake case
+
+csharp
+string snakeCase = StringUtilitiesLibrary.ToSnakeCase("HelloWorld");
+Console.WriteLine($"Snake Case: {snakeCase}"); // Output: Snake Case: hello_world
+
+Truncate a string to a specified length
+
+csharp
+string truncated = StringUtilitiesLibrary.Truncate("This is a long string", 10);
+Console.WriteLine($"Truncated: {truncated}"); // Output: Truncated: This is a 
+
+Count occurrences of a character in a string
+
+csharp
+int occurrences = StringUtilitiesLibrary.CountOccurrences("hello", 'l');
+Console.WriteLine($"Occurrences of 'l': {occurrences}"); // Output: Occurrences of 'l': 2
+
+Replace multiple spaces with a single space
+
+csharp
+string normalized = StringUtilitiesLibrary.NormalizeSpaces("This   is   a   test");
+Console.WriteLine($"Normalized Spaces: {normalized}"); // Output: Normalized Spaces: This is a test
+
+Check if a string is a valid email
+
+csharp
+bool isValidEmail = StringUtilitiesLibrary.IsValidEmail("test@example.com");
+Console.Write
+
+
+
+
+*/

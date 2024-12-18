@@ -1,0 +1,268 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+
+public static class StringUtilities
+{
+    // Check if a string is null, empty, or whitespace
+    public static bool IsNullOrEmptyOrWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input);
+    }
+
+    // Convert string to title case
+    public static string ToTitleCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        return textInfo.ToTitleCase(input.ToLower());
+    }
+
+    // Reverse a string
+    public static string Reverse(string input)
+    {
+        if (input == null) return null;
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+
+    // Generate a random string
+    public static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    // Remove all whitespace from a string
+    public static string RemoveWhitespace(string input)
+    {
+        return string.IsNullOrWhiteSpace(input) ? input : new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+    }
+
+    // Check if a string contains only digits
+    public static bool IsDigitsOnly(string input)
+    {
+        return input.All(char.IsDigit);
+    }
+
+    // Convert string to camel case
+    public static string ToCamelCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        input = ToTitleCase(input);
+        return char.ToLowerInvariant(input[0]) + input.Substring(1);
+    }
+
+    // Convert string to snake case
+    public static string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        var regex = new Regex("([a-z])([A-Z])");
+        return regex.Replace(input, "$1_$2").ToLower();
+    }
+
+    // Truncate a string to a specified length
+    public static string Truncate(string input, int maxLength)
+    {
+        if (string.IsNullOrEmpty(input) || maxLength <= 0) return string.Empty;
+        return input.Length <= maxLength ? input : input.Substring(0, maxLength);
+    }
+
+    // Count occurrences of a character in a string
+    public static int CountOccurrences(string input, char character)
+    {
+        if (input == null) return 0;
+        return input.Count(c => c == character);
+    }
+
+    // Replace multiple spaces with a single space
+    public static string NormalizeSpaces(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        return Regex.Replace(input, @"\s+", " ");
+    }
+
+    // Check if a string is a valid email
+    public static bool IsValidEmail(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(input);
+            return addr.Address == input;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // Convert string to base64
+    public static string ToBase64(string input)
+    {
+        if (input == null) return null;
+        var bytes = Encoding.UTF8.GetBytes(input);
+        return Convert.ToBase64String(bytes);
+    }
+
+    // Convert base64 to string
+    public static string FromBase64(string base64Input)
+    {
+        if (base64Input == null) return null;
+        var bytes = Convert.FromBase64String(base64Input);
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    // Generate MD5 hash for a string
+    public static string GenerateMD5Hash(string input)
+    {
+        using (MD5 md5 = MD5.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            byte[] hash = md5.ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
+    // Generate SHA256 hash for a string
+    public static string GenerateSHA256Hash(string input)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            byte[] hash = sha256.ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
+    // Convert string to hexadecimal
+    public static string ToHex(string input)
+    {
+        if (input == null) return null;
+        var bytes = Encoding.UTF8.GetBytes(input);
+        var hex = BitConverter.ToString(bytes).Replace("-", "");
+        return hex;
+    }
+
+    // Convert hexadecimal to string
+    public static string FromHex(string hexInput)
+    {
+        if (hexInput == null) return null;
+        int numberChars = hexInput.Length;
+        byte[] bytes = new byte[numberChars / 2];
+        for (int i = 0; i < numberChars; i += 2)
+        {
+            bytes[i / 2] = Convert.ToByte(hexInput.Substring(i, 2), 16);
+        }
+        return Encoding.UTF8.GetString(bytes);
+    }
+
+    // Validate if a string is a valid URL
+    public static bool IsValidURL(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return false;
+        return Uri.TryCreate(input, UriKind.Absolute, out Uri uriResult)
+               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+    }
+
+    // Escape HTML entities in a string
+    public static string EscapeHtml(string input)
+    {
+        if (input == null) return null;
+        return System.Net.WebUtility.HtmlEncode(input);
+    }
+
+    // Unescape HTML entities in a string
+    public static string UnescapeHtml(string input)
+    {
+        if (input == null) return null;
+        return System.Net.WebUtility.HtmlDecode(input);
+    }
+	
+	 
+    // Calculate age from date of birth
+    public static int CalculateAge(DateTime dob)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dob.Year;
+        if (dob.Date > today.AddYears(-age)) age--;
+        return age;
+    }
+
+    // Get date of birth from age
+    public static DateTime GetDateOfBirth(int age)
+    {
+        var today = DateTime.Today;
+        return today.AddYears(-age);
+    }
+
+    // Calculate the number of days between two dates
+    public static int CalculateDaysBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate - startDate).Days;
+    }
+
+    // Check if a given year is a leap year
+    public static bool IsLeapYear(int year)
+    {
+        return DateTime.IsLeapYear(year);
+    }
+
+    // Get the number of days in a month for a given year
+    public static int GetDaysInMonth(int year, int month)
+    {
+        return DateTime.DaysInMonth(year, month);
+    }
+
+    // Calculate the number of workdays between two dates
+    public static int CalculateWorkdays(DateTime startDate, DateTime endDate)
+    {
+        int totalDays = CalculateDaysBetweenDates(startDate, endDate);
+        int workDays = 0;
+
+        for (int i = 0; i <= totalDays; i++)
+        {
+            DateTime currentDate = startDate.AddDays(i);
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                workDays++;
+            }
+        }
+
+        return workDays;
+    }
+
+    // Get the next occurrence of a specific weekday from a given date
+    public static DateTime GetNextWeekday(DateTime startDate, DayOfWeek day)
+    {
+        int daysToAdd = ((int)day - (int)startDate.DayOfWeek + 7) % 7;
+        return startDate.AddDays(daysToAdd == 0 ? 7 : daysToAdd);
+    }
+
+    // Add a specified number of business days to a given date
+    public static DateTime AddBusinessDays(DateTime startDate, int numberOfDays)
+    {
+        int addedDays = 0;
+        DateTime currentDate = startDate;
+
+        while (addedDays < numberOfDays)
+        {
+            currentDate = currentDate.AddDays(1);
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                addedDays++;
+            }
+        }
+
+        return currentDate;
+    }
+	
+	// Calculate compound interest public static double CalculateCompoundInterest(double principal, double rate, int timesCompounded, int years) { return principal * Math.Pow((1 + rate / timesCompounded), timesCompounded * years); } // Calculate the number of months between two dates public static int CalculateMonthsBetweenDates(DateTime startDate, DateTime endDate) { return (endDate.Year - startDate.Year) * 12 + endDate.Month - startDate.Month; } // Calculate the difference in hours between two dates public static double CalculateHoursBetweenDates(DateTime startDate, DateTime endDate) { return (endDate - startDate).TotalHours; } // Calculate the difference in minutes between two dates public static double CalculateMinutesBetweenDates(DateTime startDate, DateTime endDate) { return (endDate - startDate).TotalMinutes; } // Calculate the difference in seconds between two dates public static double CalculateSecondsBetweenDates(DateTime startDate, DateTime endDate) { return (endDate - startDate).TotalSeconds; } // Calculate the future value of an investment public static double CalculateFutureValue(double presentValue, double rate, int periods) { return presentValue * Math.Pow(1 + rate, periods); } // Calculate the present value of a future amount public static double CalculatePresentValue(double futureValue, double rate, int periods) { return futureValue / Math.Pow(1 + rate, periods); } // Calculate the monthly payment for a loan public static double CalculateMonthlyLoanPayment(double principal, double annualRate, int totalPayments) { double monthlyRate = annualRate / 12; return (principal * monthlyRate) / (1 - Math.Pow(1 + monthlyRate, -totalPayments)); } // Calculate the total interest paid on a loan public static double CalculateTotalInterestPaid(double principal, double annualRate, int totalPayments) { double monthlyPayment = CalculateMonthlyLoanPayment(principal, annualRate, totalPayments); return (monthlyPayment * totalPayments) - principal; } // Calculate the time until a specific date public static TimeSpan CalculateTimeUntil(DateTime futureDate) { return futureDate - DateTime.Now; }
+
+	
+}

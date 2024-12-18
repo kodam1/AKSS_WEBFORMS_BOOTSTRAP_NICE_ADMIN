@@ -1,0 +1,270 @@
+using System;
+
+public static class CalculationLibrary
+{
+    // Calculate age from date of birth
+    public static int CalculateAge(DateTime dob)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dob.Year;
+        if (dob.Date > today.AddYears(-age)) age--;
+        return age;
+    }
+
+    // Get date of birth from age
+    public static DateTime GetDateOfBirth(int age)
+    {
+        var today = DateTime.Today;
+        return today.AddYears(-age);
+    }
+
+    // Calculate the number of days between two dates
+    public static int CalculateDaysBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate - startDate).Days;
+    }
+
+    // Check if a given year is a leap year
+    public static bool IsLeapYear(int year)
+    {
+        return DateTime.IsLeapYear(year);
+    }
+
+    // Get the number of days in a month for a given year
+    public static int GetDaysInMonth(int year, int month)
+    {
+        return DateTime.DaysInMonth(year, month);
+    }
+
+    // Calculate the number of workdays between two dates
+    public static int CalculateWorkdays(DateTime startDate, DateTime endDate)
+    {
+        int totalDays = CalculateDaysBetweenDates(startDate, endDate);
+        int workDays = 0;
+
+        for (int i = 0; i <= totalDays; i++)
+        {
+            DateTime currentDate = startDate.AddDays(i);
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                workDays++;
+            }
+        }
+
+        return workDays;
+    }
+
+    // Get the next occurrence of a specific weekday from a given date
+    public static DateTime GetNextWeekday(DateTime startDate, DayOfWeek day)
+    {
+        int daysToAdd = ((int)day - (int)startDate.DayOfWeek + 7) % 7;
+        return startDate.AddDays(daysToAdd == 0 ? 7 : daysToAdd);
+    }
+
+    // Add a specified number of business days to a given date
+    public static DateTime AddBusinessDays(DateTime startDate, int numberOfDays)
+    {
+        int addedDays = 0;
+        DateTime currentDate = startDate;
+
+        while (addedDays < numberOfDays)
+        {
+            currentDate = currentDate.AddDays(1);
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                addedDays++;
+            }
+        }
+
+        return currentDate;
+    }
+
+    // Calculate compound interest
+    public static double CalculateCompoundInterest(double principal, double rate, int timesCompounded, int years)
+    {
+        return principal * Math.Pow((1 + rate / timesCompounded), timesCompounded * years);
+    }
+
+    // Calculate the number of months between two dates
+    public static int CalculateMonthsBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate.Year - startDate.Year) * 12 + endDate.Month - startDate.Month;
+    }
+
+    // Calculate the difference in hours between two dates
+    public static double CalculateHoursBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate - startDate).TotalHours;
+    }
+
+    // Calculate the difference in minutes between two dates
+    public static double CalculateMinutesBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate - startDate).TotalMinutes;
+    }
+
+    // Calculate the difference in seconds between two dates
+    public static double CalculateSecondsBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        return (endDate - startDate).TotalSeconds;
+    }
+
+    // Calculate the future value of an investment
+    public static double CalculateFutureValue(double presentValue, double rate, int periods)
+    {
+        return presentValue * Math.Pow(1 + rate, periods);
+    }
+
+    // Calculate the present value of a future amount
+    public static double CalculatePresentValue(double futureValue, double rate, int periods)
+    {
+        return futureValue / Math.Pow(1 + rate, periods);
+    }
+
+    // Calculate the monthly payment for a loan
+    public static double CalculateMonthlyLoanPayment(double principal, double annualRate, int totalPayments)
+    {
+        double monthlyRate = annualRate / 12;
+        return (principal * monthlyRate) / (1 - Math.Pow(1 + monthlyRate, -totalPayments));
+    }
+
+    // Calculate the total interest paid on a loan
+    public static double CalculateTotalInterestPaid(double principal, double annualRate, int totalPayments)
+    {
+        double monthlyPayment = CalculateMonthlyLoanPayment(principal, annualRate, totalPayments);
+        return (monthlyPayment * totalPayments) - principal;
+    }
+
+    // Calculate the time until a specific date
+    public static TimeSpan CalculateTimeUntil(DateTime futureDate)
+    {
+        return futureDate - DateTime.Now;
+    }
+
+    // Calculate the Body Mass Index (BMI)
+    public static double CalculateBMI(double weightKg, double heightM)
+    {
+        return weightKg / (heightM * heightM);
+    }
+
+    // Calculate the distance between two points (Haversine formula)
+    public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double R = 6371; // Radius of the Earth in kilometers
+        double dLat = ToRadians(lat2 - lat1);
+        double dLon = ToRadians(lon2 - lon1);
+
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return R * c;
+    }
+
+    // Convert degrees to radians
+    public static double ToRadians(double degrees)
+    {
+        return degrees * (Math.PI / 180);
+    }
+
+    // Calculate the area of a triangle using Heron's formula
+    public static double CalculateTriangleArea(double a, double b, double c)
+    {
+        double s = (a + b + c) / 2;
+        return Math.Sqrt(s * (s - a) * (s - b) * (s - c));
+    }
+
+    // Calculate the Fibonacci sequence up to the Nth term
+    public static int[] CalculateFibonacci(int n)
+    {
+        int[] fibonacci = new int[n];
+        if (n > 0) fibonacci[0] = 0;
+        if (n > 1) fibonacci[1] = 1;
+
+        for (int i = 2; i < n; i++)
+        {
+            fibonacci[i] = fibonacci[i - 1] + fibonacci[i - 2];
+        }
+
+        return fibonacci;
+    }
+
+    // Check if a number is prime
+    public static bool IsPrime(int number)
+    {
+        if (number <= 1) return false;
+        if (number == 2) return true;
+        if (number % 2 == 0) return false;
+
+        for (int i = 3; i <= Math.Sqrt(number); i += 2)
+        {
+            if (number % i == 0) return false;
+        }
+
+        return true;
+    }
+
+    // Calculate the greatest common divisor (GCD) of two numbers using Euclid's algorithm
+    public static int CalculateGCD(int a, int b)
+    {
+        while (b != 0)
+        {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    // Calculate the least common multiple (LCM) of two numbers
+    public static int CalculateLCM(int a, int b)
+    {
+        return Math.Abs(a * b) / CalculateGCD(a, b);
+    }
+
+    // Calculate the square root of a number using Newton's method
+    public static double CalculateSquareRoot(double number)
+    {
+        if (number < 0) throw new ArgumentOutOfRangeException(nameof(number), "Cannot calculate square root of a negative number.");
+        double epsilon = 1e-10; // Precision level
+        double guess = number / 2.0;
+
+        while (Math.Abs(guess * guess - number) >= epsilon)
+        {
+            guess = (guess + number / guess) / 2.0;
+        }
+
+        return guess;
+    }
+
+    // Calculate the power of a number (x^y)
+    public static double CalculatePower(double x, double y)
+    {
+        return Math.Pow(x, y);
+    }
+
+    // Calculate the natural logarithm of a number
+    public static double CalculateLog(double number)
+    {
+        return Math.Log(number);
+    }
+
+    // Calculate the logarithm of a number to a specified base
+    public static double CalculateLogBase(double number, double baseValue)
+    {
+        return Math.Log(number, baseValue);
+    }
+
+    // Convert radians to degrees
+    public static double ToDegrees(double radians)
+    {
+        return radians * (180 / Math.PI);
+    }
+
+    // Calculate the sum of an array of integers
+    public static int CalculateSum(int[] numbers)
+    {
+        int sum = 0;
+        foreach (int number in numbers)
+        {
+[_{{{CITATION{{{_1{](https://github.com/jonathankauch/runnity-windows-phone/tree/379aa80172293986a5cacf1160171a889d37cf0e/RunIt%2FRunIt%2FView%2FMainView.xaml.cs)[_{{{CITATION{{{_2{](https://github.com/dundurlunka/ZakaraiMe/tree/f23e38de1785325853f068c06c07b92693437712/ZakaraiMe.Service%2FImplementations%2FJourneyService.cs)[_{{{CITATION{{{_3{](https://github.com/JerMej1s/DevBuildLab6_1_PrimeNumbers/tree/636a56738e0bb91f61af4b1328033f61d3e4e635/Program.cs)[_{{{CITATION{{{_4{](https://github.com/pastraka/ProgrammingFundamentalsSoftuni-Csharp/tree/c20a9e6538cc92f8a9918d210a5cd06409bba9a0/4.%20Methods-Debugging-and-Troubleshooting-Code%2FExersices%2FprimeChecker%2FProgram.cs)
